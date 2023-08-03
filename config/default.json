@@ -1,0 +1,6 @@
+{
+  "port": 5000,
+  "jwtSecret": "bohdana planner",
+  "mongoUri": "mongodb+srv://bohdana:yE7x1IBblzEDd8kh@cluster0.1uhura9.mongodb.net/?retryWrites=true&w=majority",
+  "baseUrl": "http://localhost:5000"
+}
