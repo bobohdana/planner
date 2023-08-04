@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import styled from '@emotion/styled'
+import dayjs from 'dayjs'
 
 import {
   Checkbox as MUICheckbox,
@@ -16,10 +17,14 @@ import {
 } from '@mui/icons-material'
 
 import { AuthContext } from '../context/AuthContext'
+import { Context } from '../context/Context'
 import { updatePlan } from '../store/PlanSlice'
 
 const GridItem = ({ plans, date }) => {
+  const { sortedBy, range: [firstDate] } = React.useContext(Context)
   const auth = React.useContext(AuthContext)
+
+  const isWeek = sortedBy === 'week'
   const { loading } = useSelector(props => props.plans)
 
   const dispatch = useDispatch()
@@ -39,16 +44,18 @@ const GridItem = ({ plans, date }) => {
   }
 
   const dayNumber = date.getDate()
+  const today = date.getTime() === new Date(dayjs().startOf('day')).getTime()
+  const minor = !isWeek && date.getMonth() != dayjs(firstDate).month()
 
   return (
-    <Block item xs={1}>
-      <Day>{dayNumber}</Day>
+    <Block item xs={1} isWeek={isWeek} minor={minor} today={today}>
+      <Day today={today}>{dayNumber}</Day>
 
       {loading ? (
         <Skeleton variant="rectangular" height={'90%'} />
       ) : (
         <Container>
-          {!!plans && plans.map(plan => {
+          {!!plans && !minor && plans.map(plan => {
             const { _id, isCompleted, text } = plan
             return (
               <ItemRoot key={_id}>
@@ -78,11 +85,22 @@ const GridItem = ({ plans, date }) => {
 
 
 const Block = styled(Grid)`
-  // border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
   border-right: 1px solid #e8e8e8;
-  color: #767676;
+  padding-bottom: 6px;
   overflow: hidden;
-  height: 400px;
+  height: ${props => 
+    props.isWeek ? '400px' : '200px'
+  };
+  background-color: ${props => 
+    props.minor ? '#efefef' : ''
+  };
+  border: ${props => 
+    props.today ? '4px solid #5db361' : ''
+  };
+  color: ${props => 
+    props.minor ? '#cecbcb' : '#767676'
+  };
 
   &:nth-of-type(7n) {
     border-right: none;

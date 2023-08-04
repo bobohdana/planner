@@ -1,6 +1,7 @@
 import React from 'react'
 
 import styled from '@emotion/styled'
+import dayjs from 'dayjs'
 
 import {
   Toolbar as MUIToolbar,
@@ -55,7 +56,6 @@ const Toolbar = () => {
           variant='outlined'
           color='success'
           onClick={moveToToday}
-          // disabled={true}
         >
           Today
         </Button>
@@ -65,7 +65,6 @@ const Toolbar = () => {
           value={sortedBy}
           onChange={changeSortedBy}
           defaultValue={'week'}
-          disabled={true}
         >
           <MenuItem value={'week'}>Week</MenuItem> 
           <MenuItem value={'month'}>Month</MenuItem>
@@ -76,7 +75,10 @@ const Toolbar = () => {
         <IconButton fontSize='large' onClick={previousPage}>
           <NavigateBefore fontSize='large' color='success' />
         </IconButton>
-        <Typography>{start} - {end}</Typography>
+        <Typography>{sortedBy === 'week' 
+          ? `${start} - ${end}` 
+          : dayjs(start).format('MMMM')}
+        </Typography>
         <IconButton fontSize='large' onClick={nextPage}>
           <NavigateNext fontSize='large' color='success' />
         </IconButton>

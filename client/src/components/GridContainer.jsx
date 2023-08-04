@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import styled from '@emotion/styled'
 
 import { Grid } from '@mui/material'
+import dayjs from 'dayjs'
 
 import { Context } from '../context/Context'
 import GridItem from './GridItem'
@@ -34,45 +35,47 @@ const Item = styled(Grid)`
   }
 `;
 
-const GridContainer = () => {
-  const [plansByDays, setPlansByDays] = React.useState(null)
+const getWeeksInMonth = (firstDay) => {
+  return Math.ceil((dayjs(firstDay).daysInMonth() + dayjs(firstDay).day()) / 7)
+}
 
+const getDate = (weekIndex, dayIndex, firstDay) => {
+  let _firstDay = firstDay
+  if (dayjs(firstDay).day() != 1) {
+    _firstDay = new Date(
+      dayjs(firstDay).subtract(dayjs(firstDay).day() - 1, 'day')
+    )
+  }
+  return (new Date(dayjs(_firstDay).add(7 * weekIndex + dayIndex, 'day')))
+}
+
+const GridContainer = () => {
+  const [plansByDate, setPlansByDate] = React.useState(null)
+  const { range, sortedBy } = React.useContext(Context)
   const { plans } = useSelector(state => state.plans)
 
-  const { range } = React.useContext(Context)
-
-  const getDate = (index) => {
-    const date = new Date(range[0])
-    return new Date(date.setDate(date.getDate() + index))
-  }
+  const numberOfWeeks = sortedBy === 'week' ? 1 : getWeeksInMonth(range[0])
 
   React.useEffect(() => {
     if (!!plans) {
       const _plans = {}
       plans.forEach((plan) => {
-        const day = (new Date(plan.date).getDay() + 6) % 7
-        _plans[day] = [
-          ...(_plans[day] || []),
-          plan,
-        ]
+        const date = dayjs(plan.date).date()
+        _plans[date] = [...(_plans[date] || []), plan]
       })
-
-      setPlansByDays({..._plans})
+      setPlansByDate({..._plans})
     }
   }, [plans])
 
   return (
     <Container>
       <Grid container columns={{ xs: 7 }}>
-        {DAYS.map((weekDay, index) => {
-          const date = getDate(index)
-          const today = new Date().toDateString() === date.toDateString()
+        {DAYS.map((weekDay) => {
           return (
             <Item
               item
               xs={1}
               key={weekDay}
-              today={today}
               textAlign={'center'}
             >
               {weekDay}
@@ -80,18 +83,20 @@ const GridContainer = () => {
           )
         })}
 
-        {
-          !!plansByDays && DAYS.map((d, index) => {
-            const date = getDate(index)
-            return (
-              <GridItem
-                key={index}
-                date={date}
-                plans={plansByDays[index]}
-              />
-            )
-          })
-        }
+        {!!plansByDate && (
+          new Array(numberOfWeeks).fill('').map((_, weekIndex) => (
+            DAYS.map((_, dayIndex) => {
+              const date = getDate(weekIndex, dayIndex, range[0])
+              return (
+                <GridItem
+                  key={date}
+                  date={date}
+                  plans={plansByDate[date.getDate()]}
+                />
+              )
+            })
+          ))
+        )}
       </Grid>
     </Container>
   )

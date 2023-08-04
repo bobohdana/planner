@@ -15,7 +15,6 @@ import {
 import dayjs from 'dayjs'
 
 import { AuthContext } from '../context/AuthContext'
-import { Context } from '../context/Context'
 
 import FormikTextField from '../components/FormikTextField'
 import DatePickerField from '../components/DatePickerField'
@@ -94,7 +93,7 @@ export default function Detail () {
   }
 
   return (
-    <Dialog onClose={handleClose} open={open}>
+    <Dialog onClose={handleClose} open={open} fullWidth>
       {!initialLoading && <Formik
         initialValues={initialValues}
         onSubmit={onSubmit}
@@ -111,7 +110,7 @@ export default function Detail () {
                 component={FormikTextField}
                 placeholder={'Type something...'}
                 multiline
-                minRows={4}
+                minRows={6}
                 maxRows={10}
               />
             </DialogContent>

@@ -1,4 +1,5 @@
 import * as Yup from 'yup'
+import dayjs from 'dayjs'
 
 export const authValidationSchema = Yup.object().shape({
   showName: Yup.boolean(),
@@ -30,41 +31,22 @@ export const getRange = (sortedBy, pageIndex) => {
   let since
   let until
 
-  const date = new Date()
   if ( sortedBy === 'month' ) {
-    since = new Date(
-      date.getFullYear(),
-      date.getMonth() + pageIndex,
-      1
-    )
-
-    until = new Date(
-      date.getFullYear(),
-      date.getMonth() + 1  + pageIndex,
-      1
-    )
+    since = new Date(dayjs().add(pageIndex, 'month').startOf('month'))
+    until = new Date(dayjs().add(pageIndex, 'month').endOf('month'))
   } else {
-    since = new Date(
-      date.setDate(date.getDate() - date.getDay() + 1 + 7 * pageIndex)
-    )
-    since.setHours(0, 0, 0)
-
-    until = new Date(
-      date.setDate(date.getDate() - date.getDay() + 8)
-    )
-    until.setHours(0, 0, 0)
+    since = new Date(dayjs().add(pageIndex, 'week').startOf('week').add(1, 'day'))
+    until = new Date(dayjs().add(pageIndex, 'week').endOf('week').add(1, 'day'))
   }
 
   return [since.getTime(), until.getTime()]
 }
 
-const options = {  month: 'short', day: 'numeric' }
 export const toShortFormat = (range) => {
   const [start, end] = range
 
-  const _end = new Date(end)
   return [
-    new Date(start).toLocaleDateString('en-us', options),
-    new Date(_end.setDate(_end.getDate() - 1)).toLocaleDateString('en-us', options)
+    dayjs(start).format('MMM D'),
+    dayjs(end).format('MMM D')
   ]
 }
