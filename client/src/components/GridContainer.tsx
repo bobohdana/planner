@@ -1,15 +1,14 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
 
 import styled from '@emotion/styled'
 
 import { Grid } from '@mui/material'
 import dayjs, { Dayjs } from 'dayjs'
 
+import { useAppSelector } from '../hooks'
+
 import { Context } from '../context/Context'
 import GridItem from './GridItem'
-
-import { IPlan } from '../interfaces'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -49,7 +48,7 @@ const getDate = (weekIndex: number, dayIndex: number, firstDay: Dayjs) => {
 const GridContainer = () => {
   const [plansByDate, setPlansByDate] = React.useState(null)
   const { range, sortedBy } = React.useContext(Context)
-  const { plans } = useSelector<any, any>(state => state.plans) //ERROR
+  const { plans } = useAppSelector(state => state.plans)
   
   const numberOfWeeks = sortedBy === 'week' ? 1 : getWeeksInMonth(range[0])
 

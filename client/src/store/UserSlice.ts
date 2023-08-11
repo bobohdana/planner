@@ -30,7 +30,7 @@ export const fetchUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   'plans/updateUser', 
-  async ({ auth, data }: { auth: IAuth, data: any }, { rejectWithValue, dispatch }) => { //ERROR
+  async ({ auth, data }: { auth: IAuth, data: any }, { rejectWithValue, dispatch }) => {
     try {
       const user = await request(`api/user`, {
         method: 'PUT',

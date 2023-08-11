@@ -116,7 +116,7 @@ interface PlanState {
 }
 
 interface Payload {
-  [key: string]: IPlan | IPlan[] | string | null | any
+  [key: string]: any
 }
 
 
@@ -130,14 +130,14 @@ const planSlice = createSlice({
   name: 'plans',
   initialState,
   reducers: {
-    addPlan (state, action: PayloadAction<Payload>) { //ERROR
+    addPlan (state, action: PayloadAction<Payload>) {
       state.plans.push(action.payload.plan)
     },
     removePlan (state, action) {
       state.plans = state.plans
         .filter(({ _id }) => _id !== action.payload.id)
     },
-    changePlan (state, action: PayloadAction<Payload>) {  //ERROR
+    changePlan (state, action: PayloadAction<Payload>) {
       state.plans = state.plans.map((plan) => {
         if (plan._id === action.payload.updatedPlan._id)
           return action.payload.updatedPlan
