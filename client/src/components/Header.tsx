@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { Link } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
 
 import { AppBar, Avatar, Toolbar, IconButton } from '@mui/material'
 import styled from '@emotion/styled'
+
+import { useAppDispatch, useAppSelector } from '../hooks'
 
 import { AuthContext } from '../context/AuthContext'
 
@@ -24,11 +25,11 @@ const StyledToolbar = styled(Toolbar)`
 `;
 
 
-const Header = () => {
+const Header: FC<{}> = () => {
   const auth = React.useContext(AuthContext)
 
-  const { picture } = useSelector(props => props.user)
-  const dispatch = useDispatch()
+  const { picture } = useAppSelector(props => props.user)
+  const dispatch = useAppDispatch()
   
   const [anchorEl, setAnchorEl] = React.useState(null)
 

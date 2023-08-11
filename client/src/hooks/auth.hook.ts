@@ -1,8 +1,10 @@
 import React from 'react'
 
+import { IAuth } from '../interfaces'
+
 const storageName = 'userData'
 
-export const useAuth = () => {
+export const useAuth = (): IAuth => {
   const [token, setToken] = React.useState(null)
   const [userId, setUserId] = React.useState(null)
 

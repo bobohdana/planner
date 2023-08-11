@@ -4,17 +4,19 @@ import { useSelector } from 'react-redux'
 import styled from '@emotion/styled'
 
 import { Grid } from '@mui/material'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 
 import { Context } from '../context/Context'
 import GridItem from './GridItem'
+
+import { IPlan } from '../interfaces'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const Container = styled.div`
   margin: 40px;
   background-color: #fff;
-  border-radius: 15px;
+  // border-radius: 15px;
   overflow: hidden;
   box-shadow: 10px 10px 40px 5px rgba(0,0,0,0.2);
 `;
@@ -24,36 +26,31 @@ const Item = styled(Grid)`
   border-right: 1px solid #e8e8e8;
   text-transform: uppercase;
   padding: 10px 5px;
-  color: ${props =>
-    props.today ? '#fff' : '#767676'};
+  color: '#767676';
   overflow: hidden;
-  background-color: ${props =>
-    props.today ? '#2e7d32' : 'none'};
-
   &:nth-of-type(7n) {
     border-right: none;
   }
 `;
 
-const getWeeksInMonth = (firstDay) => {
+const getWeeksInMonth = (firstDay: Dayjs) => {
   return Math.ceil((dayjs(firstDay).daysInMonth() + dayjs(firstDay).day()) / 7)
 }
 
-const getDate = (weekIndex, dayIndex, firstDay) => {
+const getDate = (weekIndex: number, dayIndex: number, firstDay: Dayjs) => {
   let _firstDay = firstDay
   if (dayjs(firstDay).day() != 1) {
-    _firstDay = new Date(
-      dayjs(firstDay).subtract(dayjs(firstDay).day() - 1, 'day')
+    _firstDay = dayjs(firstDay).subtract(dayjs(firstDay).day() - 1, 'day'
     )
   }
-  return (new Date(dayjs(_firstDay).add(7 * weekIndex + dayIndex, 'day')))
+  return (dayjs(_firstDay).add(7 * weekIndex + dayIndex, 'day'))
 }
 
 const GridContainer = () => {
   const [plansByDate, setPlansByDate] = React.useState(null)
   const { range, sortedBy } = React.useContext(Context)
-  const { plans } = useSelector(state => state.plans)
-
+  const { plans } = useSelector<any, any>(state => state.plans) //ERROR
+  
   const numberOfWeeks = sortedBy === 'week' ? 1 : getWeeksInMonth(range[0])
 
   React.useEffect(() => {
@@ -89,9 +86,9 @@ const GridContainer = () => {
               const date = getDate(weekIndex, dayIndex, range[0])
               return (
                 <GridItem
-                  key={date}
+                  key={dayIndex}
                   date={date}
-                  plans={plansByDate[date.getDate()]}
+                  plans={plansByDate[date.date()]}
                 />
               )
             })

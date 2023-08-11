@@ -1,5 +1,6 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+
+import { useAppDispatch } from '../hooks'
 
 import { Context } from './Context'
 import { AuthContext } from './AuthContext'
@@ -8,15 +9,16 @@ import { useHttp } from '../hooks/http.hook'
 import { fetchPlans } from '../store/PlanSlice'
 import { getRange } from '../utils'
 
+import { IRange } from '../interfaces'
 
 const ContextProvider = ({ children }) => {
-  const [sortedBy, setSortedBy] = React.useState('week')
-  const [pageIndex, setPageIndex] = React.useState(0)
-  const [range, setRange] = React.useState(null)
+  const [sortedBy, setSortedBy] = React.useState<string>('week')
+  const [pageIndex, setPageIndex] = React.useState<number>(0)
+  const [range, setRange] = React.useState<IRange>(null)
 
   const auth = React.useContext(AuthContext)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const http = useHttp()
 
   const changeSortedBy = ({ target: { value } }) => {

@@ -72,14 +72,14 @@ const Toolbar = () => {
       </Stack>
 
       <RangeContainer>
-        <IconButton fontSize='large' onClick={previousPage}>
+        <IconButton size='large' onClick={previousPage}>
           <NavigateBefore fontSize='large' color='success' />
         </IconButton>
         <Typography>{sortedBy === 'week' 
           ? `${start} - ${end}` 
           : dayjs(start).format('MMMM')}
         </Typography>
-        <IconButton fontSize='large' onClick={nextPage}>
+        <IconButton size='large' onClick={nextPage}>
           <NavigateNext fontSize='large' color='success' />
         </IconButton>
       </RangeContainer>

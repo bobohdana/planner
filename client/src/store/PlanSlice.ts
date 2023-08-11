@@ -1,10 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
+
+import { RootState } from '.'
 
 import { request } from '../hooks/http.hook'
+import { IPlan, IAuth, IRange } from '../interfaces'
 
 export const fetchPlans = createAsyncThunk(
   'plans/fetchPlans', 
-  async ({ auth, range }, { rejectWithValue }) => {
+  async ({ auth, range }: { auth: IAuth, range: IRange }, { rejectWithValue }) => {
     try {
       const data = await request(`api/plan/?range=${JSON.stringify(range)}`, {
         headers: {
@@ -24,7 +28,7 @@ export const fetchPlans = createAsyncThunk(
 
 export const fetchPlan = createAsyncThunk(
   'plans/fetchPlan', 
-  async ({ auth, id }, { rejectWithValue }) => {
+  async ({ auth, id }: { auth: IAuth, id: string }, { rejectWithValue }) => {
     try {
       const data = await request(`api/plan/${id}`, {
         headers: {
@@ -44,7 +48,7 @@ export const fetchPlan = createAsyncThunk(
 
 export const createPlan = createAsyncThunk(
   'plans/createPlan', 
-  async ({ auth, plan }, { rejectWithValue, dispatch }) => {
+  async ({ auth, plan }: { auth: IAuth, plan: IPlan }, { rejectWithValue, dispatch }) => {
     try {
       const data = await request('api/plan/create', {
         method: 'POST',
@@ -66,7 +70,7 @@ export const createPlan = createAsyncThunk(
 
 export const deletePlan = createAsyncThunk(
   'plans/deletePlan', 
-  async ({ auth, id }, { rejectWithValue, dispatch }) => {
+  async ({ auth, id }: { auth: IAuth, id: string }, { rejectWithValue, dispatch }) => {
     try {
       const data = await request(`api/plan/delete${id}`, {
         method: 'DELETE',
@@ -86,7 +90,7 @@ export const deletePlan = createAsyncThunk(
 
 export const updatePlan = createAsyncThunk(
   'plans/updatePlan', 
-  async ({ auth, plan }, { rejectWithValue, dispatch }) => {
+  async ({ auth, plan }: { auth: IAuth, plan: IPlan }, { rejectWithValue, dispatch }) => {
     try {
       const data = await request(`api/plan`, {
         method: 'PUT',
@@ -105,23 +109,35 @@ export const updatePlan = createAsyncThunk(
   }
 )
 
+interface PlanState {
+  currentPlan: IPlan,
+  plans: IPlan[],
+  loading: boolean,
+}
+
+interface Payload {
+  [key: string]: IPlan | IPlan[] | string | null | any
+}
+
+
+const initialState: PlanState = {
+  currentPlan: null,
+  plans: null,
+  loading: false,
+}
 
 const planSlice = createSlice({
   name: 'plans',
-  initialState: {
-    currentPlan: null,
-    plans: null,
-    loading: false,
-  },
+  initialState,
   reducers: {
-    addPlan (state, action) {
+    addPlan (state, action: PayloadAction<Payload>) { //ERROR
       state.plans.push(action.payload.plan)
     },
     removePlan (state, action) {
       state.plans = state.plans
         .filter(({ _id }) => _id !== action.payload.id)
     },
-    changePlan (state, action) {
+    changePlan (state, action: PayloadAction<Payload>) {  //ERROR
       state.plans = state.plans.map((plan) => {
         if (plan._id === action.payload.updatedPlan._id)
           return action.payload.updatedPlan
@@ -133,25 +149,18 @@ const planSlice = createSlice({
       state.currentPlan = null
     }
   },
-  extraReducers: {
-    [fetchPlans.pending]: (state) => {
+  extraReducers: (builder) => {
+    builder.addCase(fetchPlans.pending, (state) => {
       state.loading = true
-    },
-    [fetchPlans.fulfilled]: (state, action) => {
+    })
+    builder.addCase(fetchPlans.fulfilled, (state, action: PayloadAction<Payload>) => {      
       state.plans = action.payload.plans
       state.loading = false
-    },
-    [fetchPlan.fulfilled]: (state, action) => {
+    })
+    builder.addCase(fetchPlan.fulfilled, (state, action: PayloadAction<Payload>) => {
       state.currentPlan = action.payload.plan
-    },
-    // [createPlan.fulfilled]: (state, action) => {
-    //   console.log('fulfilled createPlan action.payload', action.payload);
-    //   // state.newPlan = action.payload.plan
-    // },
-    // [createPlan.rejected]: (action) => {
-    //   console.log('rejected', action.payload);
-    // },
-  }
+    })
+  },
 })
 
 export const { addPlan, removePlan, changePlan, clearCurrentPlan } = planSlice.actions

@@ -26,7 +26,6 @@ router.get('/', auth, async (req, res) => {
       const plans = await Plan.find({ author: req.user.userId })
 
       const { range } = req.query
-
       const _range = JSON.parse(range)
 
       const _plans = plans.filter(({ date }) => {

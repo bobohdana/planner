@@ -11,7 +11,10 @@ import { Add } from '@mui/icons-material'
 import GridContainer from '../components/GridContainer'
 import Toolbar from '../components/Toolbar'
 
-const AddButton = styled(IconButton)`
+interface AddButtonProps {
+  variant: string,
+}
+const AddButton = styled(IconButton)<AddButtonProps>`
   position: fixed !important;
   font-size: 60px;
   right: 30px;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 
 import { Formik, Form, Field, useFormikContext } from 'formik'
 
@@ -39,7 +39,12 @@ const StyledButton = styled.div`
   }
 `;
 
-const Inner = ({ isSignup, setIsSignup }) => {
+interface InnerProps {
+  isSignup: boolean,
+  setIsSignup: (arg: boolean) => void
+}
+
+const Inner: FC<InnerProps> = ({ isSignup, setIsSignup }) => {
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
   const { loading, message, clearMessage } = React.useContext(Context)
@@ -97,9 +102,8 @@ const Inner = ({ isSignup, setIsSignup }) => {
         </Button>
 
         <StyledButton
-          type="text"
           onClick={changeStatus}
-          disabled={loading}
+          // disabled={loading}
         >
           {!isSignup ? 'Sign up' : 'Already have an account?'}
         </StyledButton>

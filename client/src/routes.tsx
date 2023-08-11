@@ -10,7 +10,7 @@ export const useRoutes = (isAuthenticated) => {
   if (isAuthenticated) {
     return (
       <Routes>
-        <Route path='dashboard' exact element={<Dashboard />}>
+        <Route path='dashboard' element={<Dashboard />}>
           <Route path=':planId' element={<Detail />} />
           <Route path='profile' element={<Profile />} />
         </Route>

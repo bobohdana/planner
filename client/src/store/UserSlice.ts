@@ -1,10 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 
 import { request } from '../hooks/http.hook'
+import { IAuth } from '../interfaces'
 
 export const fetchUser = createAsyncThunk(
   'plans/fetchUser', 
-  async ({ auth }, { rejectWithValue, dispatch }) => {
+  async ({ auth }: { auth: IAuth }, { rejectWithValue, dispatch }) => {
     try {
       const data = await request(`api/user`, {
         headers: {
@@ -28,7 +30,7 @@ export const fetchUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   'plans/updateUser', 
-  async ({ auth, data }, { rejectWithValue, dispatch }) => {
+  async ({ auth, data }: { auth: IAuth, data: any }, { rejectWithValue, dispatch }) => { //ERROR
     try {
       const user = await request(`api/user`, {
         method: 'PUT',
@@ -51,21 +53,33 @@ export const updateUser = createAsyncThunk(
   }
 )
 
+interface UserState {
+  name: string,
+  email: string,
+  picture: string,
+}
+
+interface Payload {
+  [key: string]: string
+}
+
+const initialState: UserState = {
+  name: '',
+  email: '',
+  picture: '',
+}
+
 const userSlice = createSlice({
   name: 'user',
-  initialState: {
-    name: '',
-    email: '',
-    picture: '',
-  },
+  initialState,
   reducers: {
-    changeName (state, action) {
+    changeName (state, action: PayloadAction<Payload>) {
       state.name = action.payload.name
     },
-    changeEmail (state, action) {
+    changeEmail (state, action: PayloadAction<Payload>) {
       state.email = action.payload.email
     },
-    changePicture (state, action) {
+    changePicture (state, action: PayloadAction<Payload>) {
       state.picture = action.payload.picture
     },
   },

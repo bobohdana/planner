@@ -1,5 +1,4 @@
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { EffectCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
 import { Formik, Form, Field } from 'formik'
@@ -11,8 +10,9 @@ import {
   DialogActions,
   Button 
 } from '@mui/material'
+import dayjs, { Dayjs } from 'dayjs'
 
-import dayjs from 'dayjs'
+import { useAppDispatch, useAppSelector } from '../hooks'
 
 import { AuthContext } from '../context/AuthContext'
 
@@ -25,8 +25,14 @@ import {
   deletePlan,
   clearCurrentPlan } from '../store/PlanSlice'
 
+interface FormikValues {
+  text: string,
+  date: Dayjs,
+  _id?: string,
+}
+
 export default function Detail () {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const { planId } = useParams()
@@ -37,19 +43,21 @@ export default function Detail () {
   const [open, setOpen] = React.useState(true)
   const [initialLoading, setInitialLoading] = React.useState(false)
 
-  const { currentPlan } = useSelector(state => state.plans)
+  const { currentPlan } = useAppSelector(state => state.plans)
   const { _id, text, date } = currentPlan || {}
 
-  const initialValues = {
+  const initialValues: FormikValues = {
     text: (text || ''),
-    date: dayjs(date || new Date()),
+    date: date ? dayjs(date) : dayjs(),
   }
   if (_id) {
     initialValues._id = _id
   }
 
-  React.useEffect(() => {
-    return () => dispatch(clearCurrentPlan())
+  React.useEffect((): ReturnType<EffectCallback> => {
+    return (): void => {
+      dispatch(clearCurrentPlan())
+    }
   }, [])
 
   React.useEffect(() => {
@@ -73,13 +81,13 @@ export default function Detail () {
     handleClose()
   }
 
-  const onSubmit = (plan, { isSubmitting }) => {
+  const onSubmit = (plan: FormikValues) => {
     if (!plan.text) {
       return handleClose()
     }
 
     // console.log('subtract', (plan.date - Date.now()) / 86400000);
-    plan.date = plan.date.toJSON()
+
 
     if (isCreateMode) {
       dispatch(createPlan({ auth, plan }))
@@ -87,9 +95,7 @@ export default function Detail () {
       dispatch(updatePlan({ auth, plan }))
     }
 
-    if (!isSubmitting) {
-      handleClose()
-    }
+    handleClose()
   }
 
   return (

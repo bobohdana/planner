@@ -1,5 +1,7 @@
 import * as Yup from 'yup'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+
+import { IRange } from './interfaces'
 
 export const authValidationSchema = Yup.object().shape({
   showName: Yup.boolean(),
@@ -27,19 +29,19 @@ export const authInitialValues = {
   password: '' 
 }
 
-export const getRange = (sortedBy, pageIndex) => {
-  let since
-  let until
+export const getRange = (sortedBy: string, pageIndex: number): IRange => {
+  let since: Dayjs
+  let until: Dayjs
 
   if ( sortedBy === 'month' ) {
-    since = new Date(dayjs().add(pageIndex, 'month').startOf('month'))
-    until = new Date(dayjs().add(pageIndex, 'month').endOf('month'))
+    since = dayjs().add(pageIndex, 'month').startOf('month')
+    until = dayjs().add(pageIndex, 'month').endOf('month')
   } else {
-    since = new Date(dayjs().add(pageIndex, 'week').startOf('week').add(1, 'day'))
-    until = new Date(dayjs().add(pageIndex, 'week').endOf('week').add(1, 'day'))
+    since = dayjs().add(pageIndex, 'week').startOf('week').add(1, 'day')
+    until = dayjs().add(pageIndex, 'week').endOf('week').add(1, 'day')
   }
 
-  return [since.getTime(), until.getTime()]
+  return [since.valueOf(), until.valueOf()]
 }
 
 export const toShortFormat = (range) => {

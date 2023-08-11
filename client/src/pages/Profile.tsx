@@ -1,5 +1,4 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import { 
@@ -15,20 +14,22 @@ import EditIcon from '@mui/icons-material/Edit'
 
 import styled from '@emotion/styled'
 
+import { useAppDispatch, useAppSelector } from '../hooks'
+
 import { AuthContext } from '../context/AuthContext'
 
 import { fetchUser, updateUser } from '../store/UserSlice'
 
 export default function Profile () {
-  const [open, setOpen] = React.useState(true)
-  const [image, setImage] = React.useState('')
+  const [open, setOpen] = React.useState<boolean>(true)
+  const [image, setImage] = React.useState<Blob>()
   const pictureRef = React.useRef()
 
-  const { name, email, picture } = useSelector(props => props.user)
+  const { name, email, picture } = useAppSelector(props => props.user)
 
   const auth = React.useContext(AuthContext)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   React.useEffect(() => {
@@ -48,7 +49,7 @@ export default function Profile () {
     handleClose()
   }, [image])
 
-  const changeImage = (event) => {
+  const changeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setImage(event.target.files[0])
   }
 
@@ -107,7 +108,10 @@ const Picture = styled(Avatar)`
   margin: 20px 0 30px;
 `;
 
-const IconButton = styled(Button)`
+interface IconButtonProps {
+  component: React.ReactNode
+}
+const IconButton = styled(Button)<IconButtonProps>`
   text-transform: none;
   position: absolute;
   font-size: 16px;

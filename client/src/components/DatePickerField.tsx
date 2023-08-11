@@ -5,17 +5,19 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 
+import { Dayjs } from 'dayjs'
+
 import { useFormikContext } from 'formik'
 
 const DatePickerField = () => {
-  const { values, setFieldValue } = useFormikContext()
+  const { values: { date }, setFieldValue } = useFormikContext<Dayjs | null>()
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DemoContainer components={['DatePicker']}>
         <DatePicker
-          name='date'
-          value={values.date}
+          // views={['day', 'month', 'year']}
+          value={date}
           onChange={(newValue) => setFieldValue('date', newValue)}
          />
       </DemoContainer>

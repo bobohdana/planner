@@ -1,9 +1,10 @@
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import styled from '@emotion/styled'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+
+import { useAppDispatch, useAppSelector } from '../hooks'
 
 import {
   Checkbox as MUICheckbox,
@@ -20,21 +21,28 @@ import { AuthContext } from '../context/AuthContext'
 import { Context } from '../context/Context'
 import { updatePlan } from '../store/PlanSlice'
 
-const GridItem = ({ plans, date }) => {
+import { IPlan } from '../interfaces'
+
+interface GridItemProps {
+  plans: IPlan[],
+  date: Dayjs
+}
+
+const GridItem: FC<GridItemProps> = ({ plans, date }) => {
   const { sortedBy, range: [firstDate] } = React.useContext(Context)
   const auth = React.useContext(AuthContext)
 
-  const isWeek = sortedBy === 'week'
-  const { loading } = useSelector(props => props.plans)
+  const week = sortedBy === 'week'
+  const { loading }: { loading: boolean } = useAppSelector(props => props.plans)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const openDetails = (id) => {
+  const openDetails = (id: string) => {
     navigate(`${id}`)
   }
 
-  const changeCompletion = (plan) => {
+  const changeCompletion = (plan: IPlan) => {
     dispatch(updatePlan({ auth,
       plan: { 
         ...plan,
@@ -43,16 +51,20 @@ const GridItem = ({ plans, date }) => {
     }))
   }
 
-  const dayNumber = date.getDate()
-  const today = date.getTime() === new Date(dayjs().startOf('day')).getTime()
-  const minor = !isWeek && date.getMonth() != dayjs(firstDate).month()
+  const dayNumber = date.date()
+  const today = date.valueOf() === dayjs().startOf('day').valueOf()
+  const minor = !week && date.month() != dayjs(firstDate).month()
 
   return (
-    <Block item xs={1} isWeek={isWeek} minor={minor} today={today}>
-      <Day today={today}>{dayNumber}</Day>
+    <GridBlock
+      item
+      xs={1}
+      css={getCss(minor, today, week)}
+    >
+      <Day>{dayNumber}</Day>
 
       {loading ? (
-        <Skeleton variant="rectangular" height={'90%'} />
+        <Skeleton variant="rectangular" height={'86%'} animation="wave" />
       ) : (
         <Container>
           {!!plans && !minor && plans.map(plan => {
@@ -79,33 +91,38 @@ const GridItem = ({ plans, date }) => {
           })}
         </Container>
       )}
-    </Block>
+    </GridBlock>
   )
 }
 
+const getCss = (minor: boolean, today: boolean, week: boolean) => ({
+  border: today ? '4px solid #5db361' : '',
+  color: minor ? '#cecbcb' : '#767676',
+  bgColor: minor ? '#efefef' : '',
+  height: week ? '400px' : '200px',
+})
 
-const Block = styled(Grid)`
+interface BlockProps {
+  css: {
+    [key: string]: string,
+  },
+}
+const Block = styled('div')<BlockProps>`
   border-bottom: 1px solid #e8e8e8;
   border-right: 1px solid #e8e8e8;
   padding-bottom: 6px;
   overflow: hidden;
-  height: ${props => 
-    props.isWeek ? '400px' : '200px'
-  };
-  background-color: ${props => 
-    props.minor ? '#efefef' : ''
-  };
-  border: ${props => 
-    props.today ? '4px solid #5db361' : ''
-  };
-  color: ${props => 
-    props.minor ? '#cecbcb' : '#767676'
-  };
+
+  height: ${props => props.css.height};
+  background-color: ${props => props.css.bgColor};
+  border: ${props => props.css.border};
+  color: ${props => props.css.color};
 
   &:nth-of-type(7n) {
     border-right: none;
   }
 `;
+const GridBlock = Block.withComponent(Grid)
 
 const Container = styled.div`
   overflow-y: scroll;
@@ -135,16 +152,21 @@ const Checkbox = styled(MUICheckbox)`
   transform: translateY(-50%);
 `;
 
-const Item = styled.div`
+interface ItemProps {
+  isCompleted: boolean
+}
+const Item = styled.div<ItemProps>`
   display: flex;
   align-items: center;
   font-size: 12px;
   padding: 5px 5px 5px 24px;
   overflow-wrap: anywhere;
   margin-right: 10px;
+
   background-color: ${props => 
     props.isCompleted ? '#f0f0f0' : '#c2edc2'
   };
+
   border-radius: 5px;
   margin: 5px;
   cursor: pointer;
